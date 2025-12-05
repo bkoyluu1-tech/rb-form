@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>rb.com - Başvuru Sistemi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 24px 28px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #0062cc;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .info {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 16px;
+    }
+
+    .success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .fake-url {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    .records-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .small-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    #access-area {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      background: #f9f9f9;
+    }
+
+    #access-message {
+      margin-top: 6px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="fake-url">https://rb.com</div>
+    <h1>Başvuru Formu (Okul Projesi)</h1>
+    <p class="info">
+      Bu site okul projesi içindir. Girdiğiniz başvuru bilgileri bu bilgisayardaki tarayıcıda
+      <strong>kayıt altına alınır</strong> ve yalnızca yetkili e-posta adresine sahip kişiler
+      tarafından görüntülenebilir. Herhangi bir sunucuya gönderilmez.
+    </p>
+
+    <!-- 1. ADIM: KİMLİK BİLGİLERİ FORMU -->
+    <section id="step-identity">
+      <h2>Kimlik Bilgileri</h2>
+      <form id="identity-form">
+        <label for="name">Adınız</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="surname">Soyadınız</label>
+        <input type="text" id="surname" name="surname" required>
+
+        <label for="phone">Telefon Numaranız</label>
+        <input type="tel" id="phone" name="phone" placeholder="05xx xxx xx xx" required>
+
+        <label for="dob">Doğum Tarihi</label>
+        <input type="date" id="dob" name="dob" required>
+
+        <button type="submit">Devam Et</button>
+      </form>
+    </section>
+
+    <!-- 2. ADIM: MATEMATİK SORULARI -->
+    <section id="step-quiz" class="hidden">
+      <h2>Güvenlik / Doğrulama Soruları</h2>
+      <p>Başvuruyu tamamlamak için aşağıdaki 3 matematik sorusunu cevaplayın.</p>
+
+      <form id="quiz-form">
+        <div>
+          <label id="q1-label" for="q1-answer">Soru 1</label>
+          <input type="number" id="q1-answer" required>
+        </div>
+
+        <div>
+          <label id="q2-label" for="q2-answer">Soru 2</label>
+          <input type="number" id="q2-answer" required>
+        </div>
+
+        <div>
+          <label id="q3-label" for="q3-answer">Soru 3</label>
+          <input type="number" id="q3-answer" required>
+        </div>
+
+        <button type="submit">Gönder</button>
+      </form>
+
+      <div id="quiz-message" class="message hidden"></div>
+    </section>
+
+    <!-- 3. ADIM: SON MESAJ -->
+    <section id="step-result" class="hidden">
+      <h2>Başvuru Durumu</h2>
+      <div class="message success">
+        Başvurunuz değerlendirmeye alındı, teşekkür ederiz.
+      </div>
+      <p class="info">
+        Not: Bilgileriniz bu tarayıcıda saklanmaktadır. Yalnızca yetkili e-posta adresine
+        sahip kişiler, aşağıdaki bölümden giriş yaparak başvuruları görüntüleyebilir.
+      </p>
+    </section>
+
+    <!-- 4. ADIM: KAYITLI BAŞVURULAR (SADECE WHITELIST E-POSTA İLE GÖRÜNÜR) -->
+    <section id="step-records">
+      <div class="records-header">
+        <h3>Kayıtlı Başvurular (Yalnızca Yetkili Kullanıcılar)</h3>
+        <button id="clear-records" class="small-btn">Tüm Kayıtları Sil</button>
+      </div>
+
+      <div id="access-area">
+        <p class="info">
+          Başvuruları görmek için yetkili e-posta adresinizi girin. Bu proje senaryosunda
+          admin, yetkili e-posta adreslerini kodun içerisindeki whitelist listesine ekleyerek
+          erişim izni verir.
+        </p>
+        <label for="admin-email">Yetkili E-posta</label>
+        <input type="email" id="admin-email" placeholder="ornek@rb.com">
+        <button id="check-access" class="small-btn">Giriş Yap</button>
+        <div id="access-message" class="info"></div>
+      </div>
+
+      <div id="records-container" class="info hidden">
+        Kayıtlar yükleniyor...
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ==========================
+    //  WHITELIST MEKANİZMASI
+    // ==========================
+    // Buraya admin tarafından yetkili e-posta adresleri yazılır.
+    // ÖRNEK: admin yeni bir e-posta yetkilendirmek isterse, bu listeye ekler:
+    //  const WHITELIST_EMAILS = [
+    //    “bkoyluu1@gmail.com”
+    //    "danisman@okul.com"
+    //  ];
+    //
+    // Sen projende kendi istediğin adresleri buraya yazarsın.
+
+    const WHITELIST_EMAILS = [
+      “bkoyluu1@gmail.com”
+      "ogretmen@okul.com"
+    ];
+
+    const STORAGE_KEY = "rb_basvurular";
+
+    const identityForm = document.getElementById('identity-form');
+    const quizForm = document.getElementById('quiz-form');
+
+    const stepIdentity = document.getElementById('step-identity');
+    const stepQuiz = document.getElementById('step-quiz');
+    const stepResult = document.getElementById('step-result');
+
+    const q1Label = document.getElementById('q1-label');
+    const q2Label = document.getElementById('q2-label');
+    const q3Label = document.getElementById('q3-label');
+
+    const q1AnswerInput = document.getElementById('q1-answer');
+    const q2AnswerInput = document.getElementById('q2-answer');
+    const q3AnswerInput = document.getElementById('q3-answer');
+
+    const quizMessage = document.getElementById('quiz-message');
+
+    const recordsContainer = document.getElementById('records-container');
+    const clearRecordsBtn = document.getElementById('clear-records');
+
+    const adminEmailInput = document.getElementById('admin-email');
+    const checkAccessBtn = document.getElementById('check-access');
+    const accessMessage = document.getElementById('access-message');
+
+    let currentApplication = null; // Quiz bitene kadar RAM'de
+    let correctAnswer1 = null;
+    let correctAnswer2 = null;
+    let correctAnswer3 = null;
+
+    let hasAccess = false; // Yetkili e-posta ile giriş yapıldı mı?
+
+    function normalizeEmail(email) {
+      return (email || "").trim().toLowerCase();
+    }
+
+    function loadRecords() {
+      if (!hasAccess) {
+        // Yetki yoksa tabloyu hiç göstermiyoruz
+        recordsContainer.classList.add('hidden');
+        recordsContainer.textContent = "Kayıtları görmek için yetkili e-posta ile giriş yapın.";
+        return;
+      }
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        recordsContainer.classList.remove('hidden');
+        recordsContainer.textContent = "Henüz kayıtlı başvuru yok.";
+        return;
+      }
+
+      let records = [];
+      try {
+        records = JSON.parse(raw);
+      } catch (e) {
+        recordsContainer.classList.remove('hidden');
+        recordsContainer.textContent = "Kayıtlar okunurken hata oluştu.";
+        return;
+      }
+
+      if (!Array.isArray(records) || records.length === 0) {
+        recordsContainer.classList.remove('hidden');
+        recordsContainer.textContent = "Henüz kayıtlı başvuru yok.";
+        return;
+      }
+
+      let html = '<table><thead><tr>' +
+        '<th>#</th>' +
+        '<th>Ad</th>' +
+        '<th>Soyad</th>' +
+        '<th>Telefon</th>' +
+        '<th>Doğum Tarihi</th>' +
+        '<th>Başvuru Zamanı</th>' +
+        '</tr></thead><tbody>';
+
+      records.forEach((rec, index) => {
+        html += `<tr>
+          <td>${index + 1}</td>
+          <td>${rec.name || ""}</td>
+          <td>${rec.surname || ""}</td>
+          <td>${rec.phone || ""}</td>
+          <td>${rec.dob || ""}</td>
+          <td>${rec.createdAt || ""}</td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      recordsContainer.classList.remove('hidden');
+      recordsContainer.innerHTML = html;
+    }
+
+    function saveRecord(record) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let records = [];
+      if (raw) {
+        try {
+          records = JSON.parse(raw);
+          if (!Array.isArray(records)) records = [];
+        } catch (e) {
+          records = [];
+        }
+      }
+
+      records.push(record);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    clearRecordsBtn.addEventListener('click', () => {
+      if (!hasAccess) {
+        alert("Kayıtları silebilmek için önce yetkili e-posta ile giriş yapmalısınız.");
+        return;
+      }
+
+      if (confirm("Tüm kayıtları silmek istediğinizden emin misiniz?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        loadRecords();
+      }
+    });
+
+    // Rastgele toplama / çıkarma sorusu
+    function generateRandomQuestion() {
+      const a = Math.floor(Math.random() * 10) + 1; // 1-10
+      const b = Math.floor(Math.random() * 10) + 1; // 1-10
+      const isAddition = Math.random() < 0.5;
+
+      if (isAddition) {
+        return {
+          text: `${a} + ${b} = ?`,
+          answer: a + b
+        };
+      } else {
+        const max = Math.max(a, b);
+        const min = Math.min(a, b);
+        return {
+          text: `${max} - ${min} = ?`,
+          answer: max - min
+        };
+      }
+    }
+
+    function setupQuizQuestions() {
+      const q1 = generateRandomQuestion();
+      const q2 = generateRandomQuestion();
+      const q3 = generateRandomQuestion();
+
+      q1Label.textContent = `Soru 1: ${q1.text}`;
+      q2Label.textContent = `Soru 2: ${q2.text}`;
+      q3Label.textContent = `Soru 3: ${q3.text}`;
+
+      correctAnswer1 = q1.answer;
+      correctAnswer2 = q2.answer;
+      correctAnswer3 = q3.answer;
+
+      q1AnswerInput.value = '';
+      q2AnswerInput.value = '';
+      q3AnswerInput.value = '';
+
+      quizMessage.classList.add('hidden');
+      quizMessage.textContent = '';
+      quizMessage.classList.remove('error', 'success');
+    }
+
+    // 1. Form submit: kimlik bilgilerini al, quiz ekranına geç
+    identityForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const surname = document.getElementById('surname').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const dob = document.getElementById('dob').value;
+
+      if (!name || !surname || !phone || !dob) {
+        alert("Lütfen tüm alanları doldurun.");
+        return;
+      }
+
+      currentApplication = {
+        name,
+        surname,
+        phone,
+        dob,
+        createdAt: new Date().toLocaleString("tr-TR")
+      };
+
+      stepIdentity.classList.add('hidden');
+      stepQuiz.classList.remove('hidden');
+
+      setupQuizQuestions();
+    });
+
+    // 2. Quiz submit: sorular doğruysa kayıt altına al
+    quizForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const userAnswer1 = Number(q1AnswerInput.value);
+      const userAnswer2 = Number(q2AnswerInput.value);
+      const userAnswer3 = Number(q3AnswerInput.value);
+
+      const isCorrect1 = userAnswer1 === correctAnswer1;
+      const isCorrect2 = userAnswer2 === correctAnswer2;
+      const isCorrect3 = userAnswer3 === correctAnswer3;
+
+      if (isCorrect1 && isCorrect2 && isCorrect3) {
+        if (currentApplication) {
+          saveRecord(currentApplication);
+          currentApplication = null;
+        }
+
+        stepQuiz.classList.add('hidden');
+        stepResult.classList.remove('hidden');
+
+        // Eğer admin daha önce giriş yaptıysa listeyi güncelle
+        if (hasAccess) {
+          loadRecords();
+        }
+      } else {
+        quizMessage.textContent = 'Cevaplardan en az biri yanlış. Lütfen tekrar deneyin.';
+        quizMessage.classList.remove('hidden');
+        quizMessage.classList.remove('success');
+        quizMessage.classList.add('error');
+        setupQuizQuestions();
+      }
+    });
+
+    // 3. Admin erişim kontrolü (whitelist)
+    checkAccessBtn.addEventListener('click', () => {
+      const email = normalizeEmail(adminEmailInput.value);
+      if (!email) {
+        accessMessage.textContent = "Lütfen bir e-posta adresi girin.";
+        return;
+      }
+
+      const isAllowed = WHITELIST_EMAILS
+        .map(normalizeEmail)
+        .includes(email);
+
+      if (isAllowed) {
+        hasAccess = true;
+        accessMessage.textContent = "Erişim onaylandı. Kayıtlar gösteriliyor.";
+        loadRecords();
+      } else {
+        hasAccess = false;
+        recordsContainer.classList.add('hidden');
+        recordsContainer.textContent = "Kayıtları görmek için yetkili e-posta ile giriş yapın.";
+        accessMessage.textContent = "Bu e-posta adresi için yetki bulunmuyor.";
+      }
+    });
+
+    // Sayfa açıldığında: başta erişim yok, sadece mesaj
+    loadRecords();
+  </script>
+</body>
+</html>
+
